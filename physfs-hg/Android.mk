@@ -1,0 +1,10 @@
+LOCAL_PATH := $(call my-dir)
+include $(CLEAR_VARS)
+
+LOCAL_MODULE 		:= physfs
+LOCAL_C_INCLUDES 	:= $(LOCAL_PATH)/include
+LOCAL_CFLAGS += -O3 -DPHYSFS_NO_CDROM_SUPPORT -D_REENTRANT -D_THREAD_SAFE
+LOCAL_EXPORT_C_INCLUDES := $(LOCAL_PATH)/include
+LOCAL_SRC_FILES := $(subst $(LOCAL_PATH)/,, $(wildcard $(LOCAL_PATH)/src/*.c))
+
+include $(BUILD_SHARED_LIBRARY)
