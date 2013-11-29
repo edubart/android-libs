@@ -9,8 +9,8 @@ LIBDIR=$DIR/../../libs/
 cd "$SRCDIR"
 
 NDK=$ANDROID_NDK_ROOT
-NDKABI=8
-NDKVER=$NDK/toolchains/arm-linux-androideabi-4.6
+NDKABI=9
+NDKVER=$NDK/toolchains/arm-linux-androideabi-4.8
 NDKP=$NDKVER/prebuilt/${host_os}-x86_64/bin/arm-linux-androideabi-
 NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-arm"
 
@@ -26,7 +26,7 @@ if [ -f $SRCDIR/src/libluajit.a ]; then
 fi;
 
 # Android/ARM, armeabi-v7a (ARMv7 VFP), Android 4.0+ (ICS)
-NDKARCH="-march=armv7-a -mfloat-abi=softfp -Wl,--fix-cortex-a8"
+NDKARCH="-march=armv7-a -mhard-float -Wl,--fix-cortex-a8"
 DESTDIR=$LIBDIR/armeabi-v7a
 mkdir -p $DESTDIR
 rm "$DESTDIR"/luajit.so
@@ -40,7 +40,7 @@ fi;
 # Android/x86, x86 (i686 SSE3), Android 4.0+ (ICS)
 NDKABI=14
 DESTDIR=$LIBDIR/x86
-NDKVER=$NDK/toolchains/x86-4.6
+NDKVER=$NDK/toolchains/x86-4.8
 NDKP=$NDKVER/prebuilt/${host_os}-x86_64/bin/i686-linux-android-
 NDKF="--sysroot $NDK/platforms/android-$NDKABI/arch-x86"
 mkdir -p $DESTDIR

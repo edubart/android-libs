@@ -90,8 +90,8 @@ endif
 ifeq ($(SUPPORT_OGG),true)
     LOCAL_C_INCLUDES += $(LOCAL_PATH)/$(OGG_LIBRARY_PATH)/include $(LOCAL_PATH)/$(VORBIS_LIBRARY_PATH)
     LOCAL_CFLAGS += -DOGG_MUSIC -DOGG_USE_TREMOR 
-    ifeq ($(TARGET_ARCH),armeabi-v7)
-        LOCAL_CFLAGS += -D_ARM_ASSEM_
+    ifeq ($(TARGET_ARCH),arm)
+        #LOCAL_CFLAGS += -D_ARM_ASSEM_
     endif
     LOCAL_SRC_FILES += \
         $(VORBIS_LIBRARY_PATH)/mdct.c \
