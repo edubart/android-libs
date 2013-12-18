@@ -38,6 +38,6 @@ LOCAL_SRC_FILES := \
 
 LOCAL_ARM_MODE := arm
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
-LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+#LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)

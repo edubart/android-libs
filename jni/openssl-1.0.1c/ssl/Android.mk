@@ -58,18 +58,18 @@ include $(LOCAL_PATH)/../android-config.mk
 LOCAL_SRC_FILES += $(local_src_files)
 LOCAL_EXPORT_C_INCLUDES := $(local_c_includes)
 LOCAL_C_INCLUDES := $(local_c_includes)
-LOCAL_SHARED_LIBRARIES += libcrypto
+LOCAL_STATIC_LIBRARIES += libcrypto
 LOCAL_MODULE_TAGS := optional
 LOCAL_MODULE:= libssl
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_STATIC_LIBRARY)
 
 ifeq ($(WITH_HOST_DALVIK),true)
     include $(CLEAR_VARS)
     include $(LOCAL_PATH)/../android-config.mk
     LOCAL_SRC_FILES += $(local_src_files)
     LOCAL_C_INCLUDES += $(local_c_includes)
-    LOCAL_SHARED_LIBRARIES += libcrypto
+    LOCAL_STATIC_LIBRARIES += libcrypto
     LOCAL_MODULE_TAGS := optional
     LOCAL_MODULE:= libssl
-    include $(BUILD_SHARED_LIBRARY)
+    include $(BUILD_STATIC_LIBRARY)
 endif
