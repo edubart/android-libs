@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_X11
 
@@ -28,7 +28,6 @@
 #include <unistd.h>
 #include <limits.h> /* For INT_MAX */
 
-#include "SDL_x11video.h"
 #include "SDL_x11video.h"
 #include "SDL_x11touch.h"
 #include "SDL_x11xinput2.h"
@@ -561,26 +560,23 @@ X11_DispatchEvent(_THIS)
                    xevent.xconfigure.width, xevent.xconfigure.height);
 #endif
             long border_left = 0;
-            long border_right = 0;
             long border_top = 0;
-            long border_bottom = 0;
             if (data->xwindow) {
                 Atom _net_frame_extents = X11_XInternAtom(display, "_NET_FRAME_EXTENTS", 0);
-                Atom type = None;
+                Atom type;
                 int format;
-                unsigned long nitems = 0, bytes_after;
+                unsigned long nitems, bytes_after;
                 unsigned char *property;
-                X11_XGetWindowProperty(display, data->xwindow,
-                    _net_frame_extents, 0, 16, 0,
-                    XA_CARDINAL, &type, &format,
-                    &nitems, &bytes_after, &property);
-
-                if (type != None && nitems == 4)
-                {
-                    border_left = ((long*)property)[0];
-                    border_right = ((long*)property)[1];
-                    border_top = ((long*)property)[2];
-                    border_bottom = ((long*)property)[3];
+                if (X11_XGetWindowProperty(display, data->xwindow,
+                        _net_frame_extents, 0, 16, 0,
+                        XA_CARDINAL, &type, &format,
+                        &nitems, &bytes_after, &property) == Success) {
+                    if (type != None && nitems == 4)
+                    {
+                        border_left = ((long*)property)[0];
+                        border_top = ((long*)property)[2];
+                    }
+                    X11_XFree(property);
                 }
             }
 
@@ -698,7 +694,7 @@ X11_DispatchEvent(_THIS)
 
     case MotionNotify:{
             SDL_Mouse *mouse = SDL_GetMouse();
-            if(!mouse->relative_mode) {
+            if(!mouse->relative_mode || mouse->relative_mode_warp) {
 #ifdef DEBUG_MOTION
                 printf("window %p: X11 motion: %d,%d\n", xevent.xmotion.x, xevent.xmotion.y);
 #endif
@@ -993,11 +989,6 @@ X11_Pending(Display * display)
     return (0);
 }
 
-
-/* !!! FIXME: this should be exposed in a header, or something. */
-int SDL_GetNumTouch(void);
-void SDL_dbus_screensaver_tickle(_THIS);
-
 void
 X11_PumpEvents(_THIS)
 {
@@ -1035,7 +1026,19 @@ X11_SuspendScreenSaver(_THIS)
     SDL_VideoData *data = (SDL_VideoData *) _this->driverdata;
     int dummy;
     int major_version, minor_version;
+#endif /* SDL_VIDEO_DRIVER_X11_XSCRNSAVER */
 
+#if SDL_USE_LIBDBUS
+    if (SDL_dbus_screensaver_inhibit(_this)) {
+        return;
+    }
+
+    if (_this->suspend_screensaver) {
+        SDL_dbus_screensaver_tickle(_this);
+    }
+#endif
+
+#if SDL_VIDEO_DRIVER_X11_XSCRNSAVER
     if (SDL_X11_HAVE_XSS) {
         /* X11_XScreenSaverSuspend was introduced in MIT-SCREEN-SAVER 1.1 */
         if (!X11_XScreenSaverQueryExtension(data->display, &dummy, &dummy) ||
@@ -1047,12 +1050,6 @@ X11_SuspendScreenSaver(_THIS)
 
         X11_XScreenSaverSuspend(data->display, _this->suspend_screensaver);
         X11_XResetScreenSaver(data->display);
-    }
-#endif
-
-#if SDL_USE_LIBDBUS
-    if (_this->suspend_screensaver) {
-        SDL_dbus_screensaver_tickle(_this);
     }
 #endif
 }

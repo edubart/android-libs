@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /*
    Code to load and save surfaces in Windows BMP format.
@@ -33,6 +33,7 @@
 */
 
 #include "SDL_video.h"
+#include "SDL_assert.h"
 #include "SDL_endian.h"
 #include "SDL_pixels_c.h"
 
@@ -268,6 +269,7 @@ SDL_LoadBMP_RW(SDL_RWops * src, int freesrc)
     /* Load the palette, if any */
     palette = (surface->format)->palette;
     if (palette) {
+        SDL_assert(biBitCount <= 8);
         if (biClrUsed == 0) {
             biClrUsed = 1 << biBitCount;
         }

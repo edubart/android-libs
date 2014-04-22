@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 #include "SDL_video.h"
 #include "SDL_blit.h"
@@ -99,12 +99,11 @@ static void
 SDL_FillRect1SSE(Uint8 *pixels, int pitch, Uint32 color, int w, int h)
 {
     int i, n;
-    Uint8 *p = NULL;
-    
+
     SSE_BEGIN;
     while (h--) {
+        Uint8 *p = pixels;
         n = w;
-        p = pixels;
 
         if (n > 63) {
             int adjust = 16 - ((uintptr_t)p & 15);
@@ -118,7 +117,6 @@ SDL_FillRect1SSE(Uint8 *pixels, int pitch, Uint32 color, int w, int h)
         if (n & 63) {
             int remainder = (n & 63);
             SDL_memset(p, color, remainder);
-            p += remainder;
         }
         pixels += pitch;
     }

@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -550,6 +550,16 @@ extern DECLSPEC int SDLCALL SDL_RenderSetClipRect(SDL_Renderer * renderer,
  */
 extern DECLSPEC void SDLCALL SDL_RenderGetClipRect(SDL_Renderer * renderer,
                                                    SDL_Rect * rect);
+
+/**
+ *  \brief Get wether clipping is enabled on the given renderer
+ *
+ *  \param renderer The renderer from which clip state should be queried.
+ *
+ *  \sa SDL_RenderGetClipRect()
+ */
+extern DECLSPEC SDL_bool SDLCALL SDL_RenderIsClipEnabled(SDL_Renderer * renderer);
+
 
 /**
  *  \brief Set the drawing scale for rendering on the current target.

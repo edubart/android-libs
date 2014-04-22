@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -19,7 +19,7 @@
   3. This notice may not be removed or altered from any source distribution.
 */
 
-#include "SDL_config.h"
+#include "../SDL_internal.h"
 
 /* General mouse handling code for SDL */
 
@@ -137,7 +137,7 @@ int SDL_SaveAllDollarTemplates(SDL_RWops *dst)
     for (i = 0; i < SDL_numGestureTouches; i++) {
         SDL_GestureTouch* touch = &SDL_gestureTouch[i];
         for (j = 0; j < touch->numDollarTemplates; j++) {
-            rtrn += SaveTemplate(&touch->dollarTemplate[i], dst);
+            rtrn += SaveTemplate(&touch->dollarTemplate[j], dst);
         }
     }
     return rtrn;
@@ -149,8 +149,8 @@ int SDL_SaveDollarTemplate(SDL_GestureID gestureId, SDL_RWops *dst)
     for (i = 0; i < SDL_numGestureTouches; i++) {
         SDL_GestureTouch* touch = &SDL_gestureTouch[i];
         for (j = 0; j < touch->numDollarTemplates; j++) {
-            if (touch->dollarTemplate[i].hash == gestureId) {
-                return SaveTemplate(&touch->dollarTemplate[i], dst);
+            if (touch->dollarTemplate[j].hash == gestureId) {
+                return SaveTemplate(&touch->dollarTemplate[j], dst);
             }
         }
     }
@@ -418,13 +418,8 @@ int SDL_GestureAddTouch(SDL_TouchID touchId)
 
     SDL_gestureTouch = gestureTouch;
 
-    SDL_gestureTouch[SDL_numGestureTouches].numDownFingers = 0;
+    SDL_zero(SDL_gestureTouch[SDL_numGestureTouches]);
     SDL_gestureTouch[SDL_numGestureTouches].id = touchId;
-
-    SDL_gestureTouch[SDL_numGestureTouches].numDollarTemplates = 0;
-
-    SDL_gestureTouch[SDL_numGestureTouches].recording = SDL_FALSE;
-
     SDL_numGestureTouches++;
     return 0;
 }
@@ -459,8 +454,8 @@ static int SDL_SendGestureDollar(SDL_GestureTouch* touch,
     SDL_Event event;
     event.dgesture.type = SDL_DOLLARGESTURE;
     event.dgesture.touchId = touch->id;
-    event.mgesture.x = touch->centroid.x;
-    event.mgesture.y = touch->centroid.y;
+    event.dgesture.x = touch->centroid.x;
+    event.dgesture.y = touch->centroid.y;
     event.dgesture.gestureId = gestureId;
     event.dgesture.error = error;
     /* A finger came up to trigger this event. */

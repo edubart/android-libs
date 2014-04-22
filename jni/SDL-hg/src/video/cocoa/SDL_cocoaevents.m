@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,13 +18,14 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
 #include "SDL_timer.h"
 
 #include "SDL_cocoavideo.h"
 #include "../../events/SDL_events_c.h"
+#include "SDL_assert.h"
 
 #if !defined(UsrActivity) && defined(__LP64__) && !defined(__POWER__)
 /*
@@ -35,6 +36,22 @@
  */
 #define UsrActivity 1
 #endif
+
+@interface SDLApplication : NSApplication
+
+- (void)terminate:(id)sender;
+
+@end
+
+@implementation SDLApplication
+
+// Override terminate to handle Quit and System Shutdown smoothly.
+- (void)terminate:(id)sender
+{
+    SDL_SendQuit();
+}
+
+@end // SDLApplication
 
 /* setAppleMenu disappeared from the headers in 10.4 */
 @interface NSApplication(NSAppleMenu)
@@ -69,12 +86,6 @@
 {
     [[NSNotificationCenter defaultCenter] removeObserver:self];
     [super dealloc];
-}
-
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
-{
-    SDL_SendQuit();
-    return NSTerminateCancel;
 }
 
 - (void)focusSomeWindow:(NSNotification *)aNotification
@@ -125,13 +136,12 @@ static SDLAppDelegate *appDelegate = nil;
 static NSString *
 GetApplicationName(void)
 {
-    NSDictionary *dict;
-    NSString *appName = 0;
+    NSString *appName;
 
     /* Determine the application name */
-    dict = (NSDictionary *)CFBundleGetInfoDictionary(CFBundleGetMainBundle());
-    if (dict)
-        appName = [dict objectForKey: @"CFBundleName"];
+    appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleDisplayName"];
+    if (!appName)
+        appName = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"CFBundleName"];
 
     if (![appName length])
         appName = [[NSProcessInfo processInfo] processName];
@@ -149,13 +159,19 @@ CreateApplicationMenus(void)
     NSMenu *windowMenu;
     NSMenu *viewMenu;
     NSMenuItem *menuItem;
+    NSMenu *mainMenu;
 
     if (NSApp == nil) {
         return;
     }
-    
+
+    mainMenu = [[NSMenu alloc] init];
+
     /* Create the main menu bar */
-    [NSApp setMainMenu:[[NSMenu alloc] init]];
+    [NSApp setMainMenu:mainMenu];
+
+    [mainMenu release];  /* we're done with it, let NSApp own it. */
+    mainMenu = nil;
 
     /* Create the application menu */
     appName = GetApplicationName();
@@ -256,15 +272,20 @@ Cocoa_RegisterApp(void)
 
     pool = [[NSAutoreleasePool alloc] init];
     if (NSApp == nil) {
-        [NSApplication sharedApplication];
+        [SDLApplication sharedApplication];
+        SDL_assert(NSApp != nil);
 
         if ([NSApp mainMenu] == nil) {
             CreateApplicationMenus();
         }
         [NSApp finishLaunching];
-        NSDictionary *appDefaults = [NSDictionary dictionaryWithObject:@"NO" forKey:@"AppleMomentumScrollSupported"];
+        NSDictionary *appDefaults = [[NSDictionary alloc] initWithObjectsAndKeys:
+            [NSNumber numberWithBool:NO], @"AppleMomentumScrollSupported",
+            [NSNumber numberWithBool:NO], @"ApplePressAndHoldEnabled",
+            [NSNumber numberWithBool:YES], @"ApplePersistenceIgnoreState",
+            nil];
         [[NSUserDefaults standardUserDefaults] registerDefaults:appDefaults];
-
+        [appDefaults release];
     }
     if (NSApp && !appDelegate) {
         appDelegate = [[SDLAppDelegate alloc] init];

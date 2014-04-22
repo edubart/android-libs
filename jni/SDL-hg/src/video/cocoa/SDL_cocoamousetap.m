@@ -1,6 +1,6 @@
 /*
   Simple DirectMedia Layer
-  Copyright (C) 1997-2013 Sam Lantinga <slouken@libsdl.org>
+  Copyright (C) 1997-2014 Sam Lantinga <slouken@libsdl.org>
 
   This software is provided 'as-is', without any express or implied
   warranty.  In no event will the authors be held liable for any damages
@@ -18,7 +18,7 @@
      misrepresented as being the original software.
   3. This notice may not be removed or altered from any source distribution.
 */
-#include "SDL_config.h"
+#include "../../SDL_internal.h"
 
 #if SDL_VIDEO_DRIVER_COCOA
 
@@ -63,7 +63,7 @@ Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
     SDL_MouseEventTapData *tapdata = (SDL_MouseEventTapData*)refcon;
     SDL_Mouse *mouse = SDL_GetMouse();
     SDL_Window *window = SDL_GetKeyboardFocus();
-    NSWindow *nswindow = ((SDL_WindowData *) window->driverdata)->nswindow;
+    NSWindow *nswindow;
     NSRect windowRect;
     CGPoint eventLocation;
 
@@ -93,6 +93,7 @@ Cocoa_MouseTapCallback(CGEventTapProxy proxy, CGEventType type, CGEventRef event
     }
 
     /* This is the same coordinate system as Cocoa uses. */
+    nswindow = ((SDL_WindowData *) window->driverdata)->nswindow;
     eventLocation = CGEventGetUnflippedLocation(event);
     windowRect = [nswindow contentRectForFrameRect:[nswindow frame]];
 

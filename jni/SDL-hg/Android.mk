@@ -38,6 +38,6 @@ LOCAL_SRC_FILES := \
 
 LOCAL_ARM_MODE := arm
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
-#LOCAL_LDLIBS := -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+LOCAL_EXPORT_LDLIBS := -Wl,--undefined=Java_org_libsdl_app_SDLActivity_nativeInit -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
 include $(BUILD_STATIC_LIBRARY)
