@@ -159,7 +159,7 @@ echo "Detected Android NDK version $NDK_RN"
 
 TOOLCHAIN=arm-linux-androideabi-4.8
 CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/arm-linux-androideabi-g++
-if [ "$ABI" == "x86" ]; then
+if [ "$ABI" = "x86" ]; then
     TOOLCHAIN=x86-4.8
     CXXPATH=$AndroidNDKRoot/toolchains/${TOOLCHAIN}/prebuilt/${PlatformOS}-x86_64/bin/i686-linux-android-g++
 fi
