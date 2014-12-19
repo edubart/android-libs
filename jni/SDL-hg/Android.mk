@@ -15,6 +15,7 @@ LOCAL_SRC_FILES := \
 		$(LOCAL_PATH)/src/atomic/SDL_spinlock.c.arm \
 		$(wildcard $(LOCAL_PATH)/src/core/android/*.c) \
 		$(wildcard $(LOCAL_PATH)/src/cpuinfo/*.c) \
+		$(wildcard $(LOCAL_PATH)/src/dynapi/*.c) \
 		$(wildcard $(LOCAL_PATH)/src/events/*.c) \
 		$(wildcard $(LOCAL_PATH)/src/file/*.c) \
 		$(wildcard $(LOCAL_PATH)/src/haptic/*.c) \
@@ -38,6 +39,6 @@ LOCAL_SRC_FILES := \
 
 LOCAL_ARM_MODE := arm
 LOCAL_CFLAGS += -DGL_GLEXT_PROTOTYPES
-LOCAL_EXPORT_LDLIBS := -Wl,--undefined=Java_org_libsdl_app_SDLActivity_nativeInit -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
+#LOCAL_EXPORT_LDLIBS := -Wl,--undefined=Java_org_libsdl_app_SDLActivity_nativeInit -ldl -lGLESv1_CM -lGLESv2 -llog -landroid
 
 include $(BUILD_STATIC_LIBRARY)
